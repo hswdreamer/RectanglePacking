@@ -5,12 +5,9 @@ namespace HswDreamer;
 public static class RectExtention
 {
 	public static double Area(this Rect rect) => rect.Width * rect.Height;
-	public static double Left(this Rect rect) => rect.Left;
-	public static double Right(this Rect rect) => rect.Right;
-	public static double Top(this Rect rect) => rect.Bottom;
-	public static double Bottom(this Rect rect) => rect.Top;
-	public static Point LeftTop(this Rect rect) => new Point(rect.Left(), rect.Top());
-	public static Point RightTop(this Rect rect) => new Point(rect.Right(), rect.Top());
-	public static Point LeftBottom(this Rect rect) => new Point(rect.Left(), rect.Bottom());
-	public static Point RightBottom(this Rect rect) => new Point(rect.Right(), rect.Bottom());
+    public static bool Include(this Rect rect, Point pt) => pt.X > rect.Left && pt.X < rect.Right && pt.Y > rect.Top && pt.Y < rect.Bottom;
+    public static Point TopMid(this Rect rect) => new((rect.Right - rect.Left) / 2, rect.Top);
+    public static Point BottomMid(this Rect rect) => new((rect.Right - rect.Left) / 2, rect.Bottom);
+    public static Point LeftMid(this Rect rect) => new(rect.Left, (rect.Bottom - rect.Top) / 2);
+    public static Point RightMid(this Rect rect) => new(rect.Right, (rect.Bottom - rect.Top) / 2);
 }

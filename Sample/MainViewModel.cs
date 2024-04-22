@@ -1,4 +1,6 @@
-﻿using HswDreamer;
+﻿using System;
+using System.Linq;
+using HswDreamer;
 using ReactiveUI;
 using ReactiveUI.Fody.Helpers;
 using System.Diagnostics;
@@ -26,7 +28,7 @@ public class MainViewModel : ReactiveObject
 		RectPacker rectPacker = new(1000, 500);
 		List<RectItem> Items = new();
 		Random rnd = new Random();
-		for (int i = 0; i < 500; i++)
+		for (int i = 0; i < 200; i++)
 		{
 			// CASE 1
 			//var w = rnd.Next(1000);
@@ -37,14 +39,18 @@ public class MainViewModel : ReactiveObject
 			//	h += 100;
 
 			// CASE 2
-			var w = rnd.Next(80) + 20;
-			var h = rnd.Next(80) + 20;
+			//var w = rnd.Next(80) + 20;
+			//var h = rnd.Next(80) + 20;
+
+			// CASE 3
+			var w = rnd.Next(100) + 20;
+			var h = rnd.Next(200) + 20;
 
 			var color = new Color() { A = 255, R = (byte)(rnd.Next(200) + 55), G = (byte)(rnd.Next(200) + 55), B = (byte)(rnd.Next(200) + 55) };
 			var item = new RectItem(w, h, color);
 			Items.Add(item);
 		}
-		
+			
 		Stopwatch timer = Stopwatch.StartNew();
 		var Document = rectPacker.Packing(Items);
 		timer.Stop();
@@ -60,7 +66,8 @@ public class MainViewModel : ReactiveObject
 		foreach (var page in Document)
 		{
 			double pageWidth = 0;
-			foreach (var item in page.Value)
+            List<Rect?> rects = new List<Rect?>();
+            foreach (var item in page.Value)
 			{
 				Rectangle rect = new Rectangle();
 				rect.Width = item.Width;
@@ -70,7 +77,26 @@ public class MainViewModel : ReactiveObject
 				Canvas.SetLeft(rect, item.Position.X + maxX);
 				canvas.Children.Add(rect);
 				pageWidth = Math.Max(pageWidth, item.Width + item.Position.X);
-			}
+
+				// 검증
+				var find = rects.FirstOrDefault(x =>
+				{
+                    Rect r = new(item.Position, new Size(item.Width, item.Height));
+                    r.Intersect(x!.Value);
+					if (r.IsEmpty)
+	                    return false;
+                    return r.Width * r.Height > 0;
+				}, null);
+
+                rects.Add(new(item.Position, new Size(item.Width, item.Height)));
+
+
+                if (find != null)
+				{
+                    MessageBox.Show("Error");
+					Debug.WriteLine("");
+                }
+            }
 			maxX += pageWidth;
 		}
 		CanvasHeight = 500;
